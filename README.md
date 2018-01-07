@@ -1,37 +1,72 @@
-# frontend-storage-optimize
-optimize frontend storage for window.localStorage &amp; window.sessionStorage
+# Hello Storage
 
-# Install
+A local storage resolution which help developer to use localStorage/sessionStorage/cookie/object storage mode easliy.
 
-1. require by node, require.js, sea.js
-
-2. script src link
-
-# Methods
-
-1. window.storage.local(name,value,expires)
-
-use window.localStorage to store data.
-
-name - the key of data item, required.
-value - the data you want to store, optional.
-expires - how long do you want to store? by seconds. optional.
-
-i.e.
+## Install
 
 ```
-// get
-var val = window.storage.local('key');
-// set
-window.storage.local('key','val',3600*12); // support object value, object will be change to string by JSON.stringfy, and JSON.parse when you get data.
-// remove
-window.storage.local('key',null); // use null to clean the item.
+npm install --save hello-storage
 ```
 
-2. window.storage.session(name,value,expires)
+## Usage
 
-use window.sessionStorage to store data. you can use this the same with window.storage.local .
+```
+import HelloStorage from 'hello-storage'
 
-3. window.storage.object(name,value,expires)
+let store = new HelloStorage({
+  namespace: 'my.ns'
+  expires: 10*60,
+  storage: 'sessionStorage',
+})
 
-use a object variable to store data, so when you refresh window, data will be cleaned. this may be useful when you create one-pagefull app.
+store.set('my_key', { value: 'ok' })
+
+let value = store.get('my_key') // you will get an object
+```
+
+## Options
+
+**namespace**
+
+String to prepend to each key. It is recommended to use '.' like 'com.docker.service.data'.
+
+Notice: two HelloStorage instances should NOT have same namespace, or same conflict may come out.
+
+**expires**
+
+How long the value will be expired. Unit is second. If you set '0', it means the value will never expire.
+
+**storage**
+
+Which storage driver do you want to use: localStorage, sessionStorage, cookie, object.
+
+## Methods
+
+### set(key, value)
+
+Add a data to the storage. `key` is a string, which will be connected with 'namespace'. `value` can be object.
+
+```
+store.set('the_key', 'value')
+```
+
+### get(key)
+
+Get data from storage by key. If no data found by the key, or the data is expired, `null` will be returned.
+
+### remove(key)
+
+Remove a data from the storage by key.
+
+### clean()
+
+Clean expired data.
+
+### getAll()
+
+Get all data from storage. An object will be returned.
+
+### removeAll()
+
+All data in storage will be removed.
+

@@ -1,0 +1,28 @@
+{
+  "name": "hello-storage",
+  "version": "0.0.1",
+  "description": "frontend storage resolution",
+  "main": "hello-storage.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "parcel-bundler": "^1.4.1",
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "demo": "parcel demo/index.html -p 3988",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tangshuang/hello-storage.git"
+  },
+  "author": "tangshuang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tangshuang/hello-storage/issues"
+  },
+  "homepage": "https://github.com/tangshuang/hello-storage#readme"
+}
