@@ -1,6 +1,6 @@
 {
   "name": "hello-storage",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "frontend storage resolution",
   "main": "hello-storage.js",
   "dependencies": {},
@@ -12,7 +12,7 @@
     "webpack": "^3.10.0"
   },
   "scripts": {
-    "demo": "parcel demo/index.html -p 3988",
+    "start": "npm run build && parcel demo/index.html -p 3988",
     "build": "webpack"
   },
   "repository": {
