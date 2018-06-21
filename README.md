@@ -64,6 +64,10 @@ Remove a certain data from the storage by key.
 
 Clean the whole store data.
 
+### getAllKeys()
+
+Return all keys of this namespace.
+
 ## Development
 
 Use git clone the repo to your local machine, and run the following commands in the project dir:

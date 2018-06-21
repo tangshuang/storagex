@@ -76,4 +76,13 @@ export default class HelloStorage {
         }
         return this
     }
+    getAllKeys() {
+        let keys = this.storage.getItem(this.keys_namespace)
+        if (keys) {
+            keys = JSON.parse(keys)
+            keys = keys.map(key => key.replace(this.namespace + '.', ''))
+            return keys
+        }
+        return []
+    }
 }
