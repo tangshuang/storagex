@@ -34,7 +34,7 @@ Notice: two HelloStorage instances SHOULD NOT have same namespace, or same confl
 
 **expires**
 
-How long the value will be expired. Unit is micro second. If you set '0', it means the value will never expire.
+How long the value will be expired. Unit is second(1s). If you set '0', it means the value will never expire.
 
 **storage**
 
