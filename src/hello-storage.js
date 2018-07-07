@@ -2,9 +2,9 @@ export default class HelloStorage {
     constructor(options) {
         let { storage, namespace, expires } = options
         this.storage = storage || sessionStorage
-        this.namespace = namespace || '__hellostorage__'
+        this.namespace = namespace || '__HELLO_STORAGE__'
         this.expires = expires || 0
-        this.keys_namespace = this.namespace + '__keys__'
+        this.keys_namespace = this.namespace + '__KEYS__'
     }
     set(key, value, expires) {
         let id = this.namespace + '.' + key

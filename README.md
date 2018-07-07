@@ -9,6 +9,43 @@ npm install --save hello-storage
 ```
 
 ## Usage
+ES6: 
+
+```
+import HelloStorage from 'hello-storage/src/hello-storage'
+```
+
+With pack tools like webpack:
+
+```
+import HelloStorage from 'hello-storage'
+```
+
+CommonJS:
+
+```
+const HelloStorage = require('hello-storage')
+```
+
+AMD & CMD:
+
+```
+define(function(require, exports, module) {
+  const HelloStorage = require('hello-storage')
+})
+```
+
+Normal Browsers:
+
+```
+<script src="./node_modules/hello-storage/dist/hello-storage.js"></script>
+```
+
+```
+window.HelloStorage
+```
+
+To use:
 
 ```
 import HelloStorage from 'hello-storage'
@@ -21,7 +58,7 @@ let store = new HelloStorage({
 
 store.set('my_key', { value: 'ok' })
 
-let value = store.get('my_key') // you will get an object
+let value = store.get('my_key') // { value: 'ok' }
 ```
 
 ## Options
@@ -67,12 +104,3 @@ Clean the whole store data.
 ### getAllKeys()
 
 Return all keys of this namespace.
-
-## Development
-
-Use git clone the repo to your local machine, and run the following commands in the project dir:
-
-```
-npm install
-npm start
-```
