@@ -1,13 +1,11 @@
 {
   "name": "hello-storage",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "frontend storage resolution",
   "main": "hello-storage.js",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-plugin-transform-async-to-promises": "^0.7.0",
-    "babel-plugin-transform-es2015-classes": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",

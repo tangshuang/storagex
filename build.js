@@ -5,13 +5,7 @@ var namespace = 'HelloStorage'
 
 gulp.src('src/hello-storage.js')
   .pipe(babel({
-    presets: [
-      ['env']
-    ],
-    plugins: [
-      'transform-async-to-promises',
-      'transform-es2015-classes',
-    ]
+    presets: ['env'],
   }))
   .pipe(bufferify(function(content) {
 

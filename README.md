@@ -77,6 +77,21 @@ How long the value will be expired. Unit is second(1s). If you set '0', it means
 
 Which storage driver do you want to use: localStorage, sessionStorage.
 
+**async**
+
+If options.async is set to be true, all methods will return a promise, so that you can use async functions easliy:
+
+```
+let store = new HelloStorage({
+  ...
+  async: true,
+})
+
+(async function() {
+  let value = await store.get('my_key')
+})()
+```
+
 ## Methods
 
 ### set(key, value, expires)
