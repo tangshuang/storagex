@@ -75,7 +75,8 @@ How long the value will be expired. Unit is second(1s). If you set '0', it means
 
 **storage**
 
-Which storage driver do you want to use: localStorage, sessionStorage.
+Which storage driver do you want to use: localStorage, sessionStorage, AsyncStorage. 
+[AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage.html) is used for react-native, when you pass AsyncStorage, options.async should MUST be `true`.
 
 **async**
 

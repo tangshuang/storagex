@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<script src="../dist/hello-storage.js"></script>
+<script>
+  let store = new HelloStorage({
+    namespace: 'store1',
+    expires: 600,
+  })
+  function show() {
+    let value = store.get('key1')
+    document.getElementById('text').innerText = value
+  }
+  function set() {
+    store.set('key1', Date.now())
+    show()
+  }
+  function remove() {
+    store.remove('key1')
+    show()
+  }
+  function clean() {
+    store.clean()
+    show()
+  }
+  function count() {
+    let keys = store.getAllKeys()
+    document.getElementById('text').innerText = keys.length
+  }
+
+  let store2 = new HelloStorage({
+    namespace: 'store2',
+    expires: 600,
+    async: true,
+  })
+  async function ashow() {
+    let value = await store2.get('key1')
+    document.getElementById('text2').innerText = value
+  }
+  async function aset() {
+    await store2.set('key1', Date.now())
+    await ashow()
+  }
+  async function aremove() {
+    await store2.remove('key1')
+    await ashow()
+  }
+  async function aclean() {
+    await store2.clean()
+    await ashow()
+  }
+  async function acount() {
+    let keys = await store2.getAllKeys()
+    document.getElementById('text2').innerText = keys.length
+  }
+</script>
+
+<div>
+  <h2>Sync</h2>
+  <div>
+    <button id="set" onclick="set()">set</button>
+    <button id="remove" onclick="remove()">remove</button>
+    <button id="clean" onclick="clean()">clean</button>
+    <button id="count" onclick="count()">count</button>
+  </div>
+  <div id="text"></div>
+</div>
+
+<div>
+  <h2>Async</h2>
+  <div>
+    <button id="set" onclick="aset()">set</button>
+    <button id="remove" onclick="aremove()">remove</button>
+    <button id="clean" onclick="aclean()">clean</button>
+    <button id="count" onclick="acount()">count</button>
+  </div>
+  <div id="text2"></div>
+</div>

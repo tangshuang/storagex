@@ -1,5 +1,16 @@
-function asyncFn(fn) {
-    return Promise.resolve().then(() => fn())
+function asyncrun(...fns) {
+    return Promise.resolve().then(() => {
+        let i = 0
+        let run = (args) => {
+            let fn = fns[i]
+            if (!fn) {
+                return args
+            }
+            i ++
+            return Promise.resolve(fn(args)).then(run)
+        }
+        return run()
+    })
 }
 
 export default class HelloStorage {
@@ -11,16 +22,16 @@ export default class HelloStorage {
         this.keys_namespace = this.namespace + '__KEYS__'
     }
     set(key, value, expires) {
-        let fn = () => {
-            let id = this.namespace + '.' + key
-            let data = {
-                time : Date.now(),
-                expires: expires || this.expires,
-                data : value,
-            }
-            this.storage.setItem(id, JSON.stringify(data))
+        let id = this.namespace + '.' + key
+        let data = {
+            time : Date.now(),
+            expires: expires || this.expires,
+            data : value,
+        }
 
-            let keys = this.storage.getItem(this.keys_namespace)
+        let fn1 = () => this.storage.setItem(id, JSON.stringify(data))
+        let fn2 = () => this.storage.getItem(this.keys_namespace)
+        let fn3 = (keys) => {
             if (keys) {
                 keys = JSON.parse(keys)
             }
@@ -30,21 +41,24 @@ export default class HelloStorage {
             if (keys.indexOf(id) === -1) {
                 keys.push(id)
             }
-            this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
+            return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
         }
         
         if (this.async) {
-            return asyncFn(fn)
+            return asyncrun(fn1, fn2, fn3)
         }
 
-        fn()
+        fn1()
+        let keys = fn2()
+        fn3(keys)
+        
         return this
     }
     get(key) {
-        let fn = () => {
-            let id = this.namespace + '.' + key
-            let data = this.storage.getItem(id)
+        let id = this.namespace + '.' + key
 
+        let fn1 = () => this.storage.getItem(id)
+        let fn2 = (data) => {
             if (!data) {
                 return
             }
@@ -57,7 +71,6 @@ export default class HelloStorage {
                 let expiresTime = createTime + expires * 1000
                 let currentTime = Date.now()
                 if (currentTime > expiresTime) {
-                    this.remove(key)
                     return null
                 }
                 return parsed.data
@@ -66,53 +79,73 @@ export default class HelloStorage {
                 return parsed.data
             }
         }
+        let fn3 = (value) => {
+            if (value === null) {
+                return this.remove(key)
+            }
+            return value
+        }
         
         if (this.async) {
-            return asyncFn(fn)
+            return asyncrun(fn1, fn2, fn3)
         }
 
-        return fn()
+        let data = fn1()
+        let value = fn2(data)
+        fn3(value)
+
+        return value
     }
     remove(key) {
-        let fn = () => {
-            let id = this.namespace + '.' + key
-            this.storage.removeItem(id)
+        let id = this.namespace + '.' + key
 
-            let keys = this.storage.getItem(this.keys_namespace)
+        let fn1 = () => this.storage.removeItem(id)
+        let fn2 = () => this.storage.getItem(this.keys_namespace)
+        let fn3 = (keys) => {
             if (keys) {
                 keys = JSON.parse(keys)
                 keys = keys.filter(item => item !== id)
-                this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
+                return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
             }
         }
         
         if (this.async) {
-            return asyncFn(fn)
+            return asyncrun(fn1, fn2, fn3)
         }
 
-        fn()
+        fn1()
+        let keys = fn2()
+        fn3(keys)
+
         return this
     }
     clean() {
-        let fn = () => {
-            let keys = this.storage.getItem(this.keys_namespace)
+        let fn1 = () => this.storage.getItem(this.keys_namespace)
+        let fn2 = (keys) => {
             if (keys) {
                 keys = JSON.parse(keys)
-                keys.forEach(key => this.storage.removeItem(key))
-                this.storage.removeItem(this.keys_namespace)
+                return keys.map(key => this.storage.removeItem(key))
             }
+            return []
         }
+        let fn3 = () => this.storage.removeItem(this.keys_namespace)
 
         if (this.async) {
-            return asyncFn(fn)
+            return asyncrun(fn1).then((keys) => {
+                let defers = fn2(keys).map(item => asyncrun(() => item))
+                return Promise.all(defers)
+            }).then(fn3)
         }
         
-        fn()
+        let keys = fn1()
+        fn2(keys)
+        fn3()
+
         return this
     }
     getAllKeys() {
-        let fn = () => {
-            let keys = this.storage.getItem(this.keys_namespace)
+        let fn1 = () => this.storage.getItem(this.keys_namespace)
+        let fn2 = (keys) => {
             if (keys) {
                 keys = JSON.parse(keys)
                 keys = keys.map(key => key.replace(this.namespace + '.', ''))
@@ -122,9 +155,10 @@ export default class HelloStorage {
         }
         
         if (this.async) {
-            return asyncFn(fn)
+            return asyncrun(fn1, fn2)
         }
 
-        return fn()
+        let keys = fn1()
+        return fn2(keys)
     }
 }
