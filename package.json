@@ -1,17 +1,18 @@
 {
   "name": "hello-storage",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "frontend storage resolution",
-  "main": "hello-storage.js",
+  "main": "dist/hello-storage.js",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-babel": "^7.0.1",
     "gulp-bufferify": "0.0.8"
   },
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "node build.js"
   },
   "repository": {

@@ -51,9 +51,9 @@ To use:
 import HelloStorage from 'hello-storage'
 
 let store = new HelloStorage({
-  namespace: 'my.ns'
+  storage: sessionStorage, // required
+  namespace: 'my.ns', // required
   expires: 10*60,
-  storage: sessionStorage,
 })
 
 store.set('my_key', { value: 'ok' })

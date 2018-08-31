@@ -1,21 +1,23 @@
 function asyncrun(...fns) {
-    return Promise.resolve().then(() => {
-        let i = 0
-        let run = (args) => {
-            let fn = fns[i]
-            if (!fn) {
-                return args
+    return new Promise((resolve, reject) => {
+        Promise.resolve().then(() => {
+            let i = 0
+            let run = (args) => {
+                let fn = fns[i]
+                if (!fn) {
+                    return args
+                }
+                i ++
+                return Promise.resolve(fn(args)).then(run)
             }
-            i ++
-            return Promise.resolve(fn(args)).then(run)
-        }
-        return run()
+            return run()
+        }).then(resolve).catch(reject)
     })
 }
 
 export default class HelloStorage {
     constructor(options) {
-        this.storage = options.storage || sessionStorage
+        this.storage = options.storage
         this.namespace = options.namespace || '__HELLO_STORAGE__'
         this.expires = options.expires || 0
         this.async = !!options.async
@@ -143,7 +145,7 @@ export default class HelloStorage {
 
         return this
     }
-    getAllKeys() {
+    keys() {
         let fn1 = () => this.storage.getItem(this.keys_namespace)
         let fn2 = (keys) => {
             if (keys) {
