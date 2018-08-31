@@ -117,6 +117,6 @@ Remove a certain data from the storage by key.
 
 Clean the whole store data.
 
-### getAllKeys()
+### keys()
 
 Return all keys of this namespace.
