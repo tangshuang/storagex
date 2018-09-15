@@ -1,21 +1,6 @@
-function asyncrun(...fns) {
-    return Promise.resolve().then(() => {
-        let i = 0
-        let run = (args) => {
-            let fn = fns[i]
-            if (!fn) {
-                return args
-            }
-            i ++
-            return Promise.resolve(fn(args)).then(run)
-        }
-        return run()
-    })
-}
-
 export default class HelloStorage {
     constructor(options) {
-        this.storage = options.storage || sessionStorage
+        this.storage = options.storage || window.sessionStorage
         this.namespace = options.namespace || '__HELLO_STORAGE__'
         this.expires = options.expires || 0
         this.async = !!options.async
@@ -68,7 +53,7 @@ export default class HelloStorage {
 
             if (expires) {
                 let createTime = parsed.time
-                let expiresTime = createTime + expires * 1000
+                let expiresTime = createTime + expires
                 let currentTime = Date.now()
                 if (currentTime > expiresTime) {
                     return null
@@ -119,7 +104,7 @@ export default class HelloStorage {
 
         return this
     }
-    clean() {
+    clear() {
         let fn1 = () => this.storage.getItem(this.keys_namespace)
         let fn2 = (keys) => {
             if (keys) {
@@ -143,7 +128,7 @@ export default class HelloStorage {
 
         return this
     }
-    getAllKeys() {
+    keys() {
         let fn1 = () => this.storage.getItem(this.keys_namespace)
         let fn2 = (keys) => {
             if (keys) {
@@ -161,4 +146,33 @@ export default class HelloStorage {
         let keys = fn1()
         return fn2(keys)
     }
+    key(i) {
+        let fn1 = () => this.keys()
+        let fn2 = (keys) => keys[i]
+
+        if (this.async) {
+            return asyncrun(fn1).then(fn2)
+        }
+
+        let keys = fn1()
+        return fn2(keys)
+    }
+}
+
+function asyncrun(...fns) {
+    return new Promise((resolve, reject) => {
+        Promise.resolve().then(() => {
+            let i = 0
+            let run = (args) => {
+                let fn = fns[i]
+                if (!fn) {
+                    resolve(args)
+                    return
+                }
+                i ++
+                return Promise.resolve(fn(args)).then(run).catch(reject)
+            }
+            return run()
+        })
+    })
 }

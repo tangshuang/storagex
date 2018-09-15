@@ -11,43 +11,41 @@ npm install --save hello-storage
 ## Usage
 ES6: 
 
-```
+```js
 import HelloStorage from 'hello-storage/src/hello-storage'
 ```
 
 With pack tools like webpack:
 
-```
+```js
 import HelloStorage from 'hello-storage'
 ```
 
 CommonJS:
 
-```
+```js
 const HelloStorage = require('hello-storage')
 ```
 
 AMD & CMD:
 
-```
-define(function(require, exports, module) {
-  const HelloStorage = require('hello-storage')
+```js
+define(['hello-storage'], function(HelloStorage) {
 })
 ```
 
 Normal Browsers:
 
-```
+```html
 <script src="./node_modules/hello-storage/dist/hello-storage.js"></script>
-```
-
-```
-window.HelloStorage
+<script>
+const HelloStorage = window['hello-storage']
+</script>
 ```
 
 To use:
 
-```
+```js
 import HelloStorage from 'hello-storage'
 
 let store = new HelloStorage({
@@ -71,7 +69,7 @@ Notice: two HelloStorage instances SHOULD NOT have same namespace, or same confl
 
 **expires**
 
-How long the value will be expired. Unit is second(1s). If you set '0', it means the value will never expire.
+How long the value will be expired. Unit is ms. If you set '0', it means the value will never expire.
 
 **storage**
 
@@ -82,9 +80,8 @@ Which storage driver do you want to use: localStorage, sessionStorage, AsyncStor
 
 If options.async is set to be true, all methods will return a promise, so that you can use async functions easliy:
 
-```
+```js
 let store = new HelloStorage({
-  ...
   async: true,
 })
 
@@ -99,7 +96,7 @@ let store = new HelloStorage({
 
 Add a data to the storage. `key` is a string, which will be connected with 'namespace'. `value` can be object.
 
-```
+```js
 store.set('the_key', 'value')
 ```
 
@@ -113,10 +110,10 @@ Get data from storage by key. If no data found by the key, or the data is expire
 
 Remove a certain data from the storage by key.
 
-### clean()
+### clear()
 
-Clean the whole store data.
+Clear the whole store data.
 
-### getAllKeys()
+### keys()
 
 Return all keys of this namespace.

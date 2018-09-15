@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
+
+<div id="mocha"></div>
+
+<script src="../node_modules/mocha/mocha.js"></script>
+<script src="../node_modules/chai/chai.js"></script>
+<script src="../dist/hello-storage.js"></script>
+<script>
+const HelloStorage = window['hello-storage']
+const expect = chai.expect
+
+
+mocha.setup('bdd')
+
+// ------------------------- tests --------------------
+describe('sync', () => {
+  const store = new HelloStorage({
+    namespace: 'my-sync-store',
+    expires: 500,
+  })
+
+  it('set', () => {
+    store.set('key', 'value')
+    let value = store.get('key')
+    expect(value).to.equal('value')
+  })
+
+  it('set object', () => {
+    store.set('person', { name: 'tomy', age: 10 })
+    let value = store.get('person')
+    expect(value).to.deep.equal({ name: 'tomy', age: 10 })
+  })
+
+  it('get', () => {
+    let value = store.get('key')
+    expect(value).to.equal('value')
+  })
+
+  it('remove', () => {
+    store.remove('key')
+    let value = store.get('key')
+    expect(value).to.be.undefined
+  })
+
+  it('keys', () => {
+    let keys = store.keys()
+    expect(keys.length).to.equal(1)
+  })
+
+  it('key', () => {
+    let key = store.key(0)
+    expect(key).to.equal('person')
+  })
+
+  it('expires', (done) => {
+    setTimeout(() => {
+      let keys = store.keys()
+      expect(keys.length).to.equal(1)
+      let person = store.get('person')
+      expect(person).to.be.null
+      let keys2 = store.keys()
+      expect(keys2.length).to.equal(0)
+      done()
+    }, 600)
+  })
+})
+
+describe('async', () => {
+  const store = new HelloStorage({
+    namespace: 'my-async-store',
+    expires: 500,
+  })
+
+  it('set', async () => {
+    await store.set('key', 'value')
+    let value = await store.get('key')
+    expect(value).to.equal('value')
+  })
+
+  it('set object', async () => {
+    await store.set('person', { name: 'tomy', age: 10 })
+    let value = await store.get('person')
+    expect(value).to.deep.equal({ name: 'tomy', age: 10 })
+  })
+
+  it('get', async () => {
+    let value = await store.get('key')
+    expect(value).to.equal('value')
+  })
+
+  it('remove', async () => {
+    store.remove('key')
+    let value = await store.get('key')
+    expect(value).to.be.undefined
+  })
+
+  it('keys', async () => {
+    let keys = await store.keys()
+    expect(keys.length).to.equal(1)
+  })
+
+  it('key', async () => {
+    let key = await store.key(0)
+    expect(key).to.equal('person')
+  })
+
+  it('expires', (done) => {
+    setTimeout(async () => {
+      let keys = await store.keys()
+      expect(keys.length).to.equal(1)
+      let person = await store.get('person')
+      expect(person).to.be.null
+      let keys2 = await store.keys()
+      expect(keys2.length).to.equal(0)
+      done()
+    }, 600)
+  })
+})
+// ----------------------------------------------------
+
+mocha.run()
+</script>
