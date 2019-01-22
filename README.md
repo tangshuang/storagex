@@ -1,6 +1,6 @@
 # Hello Storage
 
-A local storage resolution which help developer to use localStorage/sessionStorage storage mode easliy.
+A local storage scaffold which help developer to use localStorage/sessionStorage/Storage easliy.
 
 ## Install
 
@@ -9,13 +9,7 @@ npm install --save hello-storage
 ```
 
 ## Usage
-ES6: 
-
-```js
-import HelloStorage from 'hello-storage/src/hello-storage'
-```
-
-With pack tools like webpack:
+ES6:
 
 ```js
 import HelloStorage from 'hello-storage'
@@ -24,14 +18,7 @@ import HelloStorage from 'hello-storage'
 CommonJS:
 
 ```js
-const HelloStorage = require('hello-storage')
-```
-
-AMD & CMD:
-
-```js
-define(['hello-storage'], function(HelloStorage) {
-})
+const { HelloStorage } = require('hello-storage')
 ```
 
 Normal Browsers:
@@ -39,21 +26,14 @@ Normal Browsers:
 ```html
 <script src="./node_modules/hello-storage/dist/hello-storage.js"></script>
 <script>
-const HelloStorage = window['hello-storage']
+const { HelloStorage } = window['hello-storage']
 </script>
 ```
 
 To use:
 
 ```js
-import HelloStorage from 'hello-storage'
-
-let store = new HelloStorage({
-  storage: sessionStorage, // required
-  namespace: 'my.ns', // required
-  expires: 10*60,
-})
-
+let store = new HelloStorage()
 store.set('my_key', { value: 'ok' })
 
 let value = store.get('my_key') // { value: 'ok' }
@@ -63,18 +43,25 @@ let value = store.get('my_key') // { value: 'ok' }
 
 **namespace**
 
-String to prepend to each key. It is recommended to use '.' like 'com.docker.service.data'.
+String to be prepended to each key. It is recommended to use '.' like 'com.docker.service.data'.
 
-Notice: two HelloStorage instances SHOULD NOT have same namespace, or same conflict may come out.
+Notice: two HelloStorage instances SHOULD NOT have same namespace, or some conflict may come out.
 
-**expires**
+**expire**
 
 How long the value will be expired. Unit is ms. If you set '0', it means the value will never expire.
 
 **storage**
 
-Which storage driver do you want to use: localStorage, sessionStorage, AsyncStorage. 
+Which storage driver do you want to use: localStorage, sessionStorage, AsyncStorage or any other Storage such as HelloStorage. Yes, you can use HelloStorage like a Native Storage with temporary variables.
+
+```js
+HelloStorage.setItem('key', 'value')
+HelloStorage.getItem('key')
+```
+
 [AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage.html) is used for react-native, when you pass AsyncStorage, options.async should MUST be `true`.
+[HelloIndexedDB](https://github.com/tangshuang/hello-indexeddb) is a library to use indexedDB as storage, you can use its key-value mode and with options.async=true to use it too.
 
 **async**
 
@@ -85,14 +72,14 @@ let store = new HelloStorage({
   async: true,
 })
 
-(async function() {
+;(async function() {
   let value = await store.get('my_key')
 })()
 ```
 
 ## Methods
 
-### set(key, value, expires)
+### set(key, value, expire)
 
 Add a data to the storage. `key` is a string, which will be connected with 'namespace'. `value` can be object.
 
@@ -100,7 +87,7 @@ Add a data to the storage. `key` is a string, which will be connected with 'name
 store.set('the_key', 'value')
 ```
 
-If expires is not set, options.expires will be used.
+If expire is not set, options.expire will be used.
 
 ### get(key)
 

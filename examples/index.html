@@ -2,10 +2,10 @@
 
 <script src="../dist/hello-storage.js"></script>
 <script>
-const HelloStorage = window['hello-storage']
+const { HelloStorage } = window['hello-storage']
 const store = new HelloStorage({
   namespace: 'store1',
-  expires: 600,
+  expire: 600,
 })
 function show() {
   let value = store.get('key1')
@@ -31,7 +31,7 @@ function count() {
 
 const store2 = new HelloStorage({
   namespace: 'store2',
-  expires: 600,
+  expire: 600,
   async: true,
 })
 async function ashow() {
