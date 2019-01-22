@@ -77,6 +77,11 @@ let store = new HelloStorage({
 })()
 ```
 
+**stringify**
+
+Whether to use JSON.stringify to stringify data before put into storage.
+Default is true, if you set to be false, you should must not use localStorage/sessionStorage, because they do not support storing object.
+
 ## Methods
 
 ### set(key, value, expire)

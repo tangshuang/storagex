@@ -6,6 +6,7 @@ export class HelloStorage {
     this.namespace = options.namespace || '__HELLO_STORAGE__'
     this.expire = options.expire || 0
     this.async = !!options.async
+    this.stringify = options.stringify === undefined ? true : !!options.stringify
     this.keys_namespace = this.namespace + '__KEYS__'
   }
   set(key, value, expire) {
@@ -16,14 +17,14 @@ export class HelloStorage {
       data : value,
     }
 
-    let fn1 = () => this.storage.setItem(id, JSON.stringify(data))
+    let fn1 = () => this.storage.setItem(id, this.stringify ? JSON.stringify(data) : data)
     let fn2 = () => this.storage.getItem(this.keys_namespace)
     let fn3 = (keys) => {
       keys = parsejson(keys) || []
       if (keys.indexOf(id) === -1) {
         keys.push(id)
       }
-      return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
+      return this.storage.setItem(this.keys_namespace, this.stringify ? JSON.stringify(data) : data)
     }
 
     if (this.async) {
