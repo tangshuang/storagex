@@ -24,7 +24,7 @@ export class HelloStorage {
       if (keys.indexOf(id) === -1) {
         keys.push(id)
       }
-      return this.storage.setItem(this.keys_namespace, this.stringify ? JSON.stringify(data) : data)
+      return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
     }
 
     if (this.async) {

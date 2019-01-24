@@ -1,6 +1,6 @@
 {
   "name": "hello-storage",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "js storage scaffold library.",
   "main": "dist/hello-storage.js",
   "dependencies": {},

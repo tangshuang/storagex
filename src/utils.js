@@ -18,7 +18,7 @@ export function asyncrun(...fns) {
 
 export function parsejson(str) {
   try {
-    return typeof str === 'string' ? JSON.parse(str) : str
+    return JSON.parse(str)
   }
   catch(e) {
     return
