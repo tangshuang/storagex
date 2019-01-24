@@ -46,7 +46,7 @@ export class HelloStorage {
         return
       }
 
-      let parsed = parsejson(data)
+      let parsed = this.stringify ? parsejson(data) : data
       let expire = parsed.expire
 
       if (expire) {
