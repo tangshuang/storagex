@@ -16,9 +16,21 @@ export function asyncrun(...fns) {
   })
 }
 
-export function parsejson(str) {
+export function parsejson(input) {
+  if (!input) {
+    return
+  }
+
+  if (typeof input === 'object') {
+    return input
+  }
+
+  if (typeof input !== 'string') {
+    return
+  }
+
   try {
-    return JSON.parse(str)
+    return JSON.parse(input)
   }
   catch(e) {
     return
