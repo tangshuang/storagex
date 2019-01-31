@@ -106,7 +106,7 @@ export class HelloStorage {
     let fn1 = () => this.storage.getItem(this.keys_namespace)
     let fn2 = (keys) => {
       if (keys) {
-        keys = parsejson(keys)
+        keys = parsejson(keys) || []
         return keys.map(key => this.storage.removeItem(key))
       }
       return []
@@ -130,7 +130,7 @@ export class HelloStorage {
     let fn1 = () => this.storage.getItem(this.keys_namespace)
     let fn2 = (keys) => {
       if (keys) {
-        keys = parsejson(keys)
+        keys = parsejson(keys) || []
         keys = keys.map(key => key.replace(this.namespace + '.', ''))
         return keys
       }
@@ -150,6 +150,31 @@ export class HelloStorage {
 
     if (this.async) {
       return asyncrun(fn1).then(fn2)
+    }
+
+    let keys = fn1()
+    return fn2(keys)
+  }
+  all() {
+    let build = (keys, results) => {
+      let res = {}
+      results.forEach((value, i) => {
+        let key = keys[i]
+        res[key] = value
+      })
+      return res
+    }
+    let fn1 = this.keys()
+    let fn2 = (keys) => {
+      let reuslts = keys.map(key => this.get(key))
+      return build(keys, reuslts)
+    }
+    let fn3 = (keys) => {
+      return Promise.all(keys.map(key => this.get(key))).then(results => build(keys, results))
+    }
+
+    if (this.async) {
+      return asyncrun(fn1, fn3)
     }
 
     let keys = fn1()
