@@ -164,7 +164,7 @@ export class HelloStorage {
       })
       return res
     }
-    let fn1 = this.keys()
+    let fn1 = () => this.keys()
     let fn2 = (keys) => {
       let reuslts = keys.map(key => this.get(key))
       return build(keys, reuslts)
