@@ -1,39 +1,39 @@
-# Hello Storage
+# StorageX
 
-A local storage scaffold which help developer to use localStorage/sessionStorage/Storage easliy.
+A local storage scaffold which helps developer to use localStorage/sessionStorage/Storage easliy.
 
 ## Install
 
 ```
-npm install --save hello-storage
+npm i storagex
 ```
 
 ## Usage
 ES6:
 
 ```js
-import HelloStorage from 'hello-storage'
+import StorageX from 'storagex'
 ```
 
 CommonJS:
 
 ```js
-const { HelloStorage } = require('hello-storage')
+const { StorageX } = require('storagex')
 ```
 
 Normal Browsers:
 
 ```html
-<script src="./node_modules/hello-storage/dist/hello-storage.js"></script>
+<script src="./node_modules/storagex/dist/storagex.js"></script>
 <script>
-const { HelloStorage } = window['hello-storage']
+const { StorageX } = window['storagex']
 </script>
 ```
 
 To use:
 
 ```js
-let store = new HelloStorage()
+let store = new StorageX()
 store.set('my_key', { value: 'ok' })
 
 let value = store.get('my_key') // { value: 'ok' }
@@ -45,7 +45,7 @@ let value = store.get('my_key') // { value: 'ok' }
 
 String to be prepended to each key. It is recommended to use '.' like 'com.docker.service.data'.
 
-Notice: two HelloStorage instances SHOULD NOT have same namespace, or some conflict may come out.
+Notice: two StorageX instances SHOULD NOT have same namespace, or some conflict may come out.
 
 **expire**
 
@@ -53,11 +53,11 @@ How long the value will be expired. Unit is ms. If you set '0', it means the val
 
 **storage**
 
-Which storage driver do you want to use: localStorage, sessionStorage, AsyncStorage or any other Storage such as HelloStorage. Yes, you can use HelloStorage like a Native Storage with temporary variables.
+Which storage driver do you want to use: localStorage, sessionStorage, AsyncStorage or any other Storage such as StorageX. Yes, you can use StorageX like a Native Storage with temporary variables.
 
 ```js
-HelloStorage.setItem('key', 'value')
-HelloStorage.getItem('key')
+StorageX.setItem('key', 'value')
+StorageX.getItem('key')
 ```
 
 [AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage.html) is used for react-native, when you pass AsyncStorage, options.async should MUST be `true`.
@@ -68,7 +68,7 @@ HelloStorage.getItem('key')
 If options.async is set to be true, all methods will return a promise, so that you can use async functions easliy:
 
 ```js
-let store = new HelloStorage({
+let store = new StorageX({
   async: true,
 })
 

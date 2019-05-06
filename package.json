@@ -1,8 +1,8 @@
 {
-  "name": "hello-storage",
-  "version": "2.5.2",
+  "name": "storagex",
+  "version": "1.0.0",
   "description": "js storage scaffold library.",
-  "main": "dist/hello-storage.js",
+  "main": "dist/storagex.js",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.2.2",
@@ -22,12 +22,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tangshuang/hello-storage.git"
+    "url": "git+https://github.com/tangshuang/storagex.git"
   },
   "author": "tangshuang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tangshuang/hello-storage/issues"
+    "url": "https://github.com/tangshuang/storagex/issues"
   },
-  "homepage": "https://github.com/tangshuang/hello-storage#readme"
+  "homepage": "https://github.com/tangshuang/storagex#readme"
 }

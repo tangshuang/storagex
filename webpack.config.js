@@ -1,10 +1,10 @@
 module.exports = {
   mode: 'none',
-  entry: __dirname + '/src/hello-storage.js',
+  entry: __dirname + '/src/storagex.js',
   output: {
     path: __dirname + '/dist',
-    filename: 'hello-storage.js',
-    library: 'hello-storage',
+    filename: 'storagex.js',
+    library: 'storagex',
     libraryTarget: 'umd',
     globalObject: `typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : this`,
   },

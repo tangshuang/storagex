@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<script src="../dist/hello-storage.js"></script>
+<script src="../dist/storagex.js"></script>
 <script>
-const { HelloStorage } = window['hello-storage']
-const store = new HelloStorage({
+const { StorageX } = window['storagex']
+const store = new StorageX({
   namespace: 'store1',
   expire: 600,
 })
@@ -29,7 +29,7 @@ function count() {
   document.getElementById('text').innerText = keys.length
 }
 
-const store2 = new HelloStorage({
+const store2 = new StorageX({
   namespace: 'store2',
   expire: 600,
   async: true,

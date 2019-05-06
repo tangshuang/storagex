@@ -1,9 +1,9 @@
 import { asyncrun, parsejson } from './utils'
 
-export class HelloStorage {
+export class StorageX {
   constructor(options) {
-    this.storage = options.storage || HelloStorage
-    this.namespace = options.namespace || '__HELLO_STORAGE__'
+    this.storage = options.storage || StorageX
+    this.namespace = options.namespace || '__STORAGEX__'
     this.expire = options.expire || 0
     this.async = !!options.async
     this.stringify = options.stringify === undefined ? true : !!options.stringify
@@ -34,8 +34,6 @@ export class HelloStorage {
     fn1()
     let keys = fn2()
     fn3(keys)
-
-    return this
   }
   get(key) {
     let id = this.namespace + '.' + key
@@ -78,7 +76,7 @@ export class HelloStorage {
 
     let data = fn1()
     let value = fn2(data)
-    fn3(value)
+    value = fn3(value)
 
     return value
   }
@@ -91,7 +89,7 @@ export class HelloStorage {
       if (keys) {
         keys = parsejson(keys) || []
         keys = keys.filter(item => item !== id)
-        return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
+        return this.storage.setItem(this.keys_namespace, this.stringify ? JSON.stringify(keys) : keys)
       }
     }
 
@@ -102,8 +100,6 @@ export class HelloStorage {
     fn1()
     let keys = fn2()
     fn3(keys)
-
-    return this
   }
   clear() {
     let fn1 = () => this.storage.getItem(this.keys_namespace)
@@ -152,7 +148,7 @@ export class HelloStorage {
     let fn2 = (keys) => keys[i]
 
     if (this.async) {
-      return asyncrun(fn1).then(fn2)
+      return asyncrun(fn1, fn2)
     }
 
     let keys = fn1()
@@ -186,12 +182,11 @@ export class HelloStorage {
 }
 
 const data = {}
+StorageX.getItem = key => data[key]
+StorageX.setItem = (key, value) => { data[key] = value }
+StorageX.removeItem = key => { delete data[key] }
+StorageX.keys = () => Object.keys(data)
+StorageX.key = i => StorageX.keys()[i]
+StorageX.clear = () => StorageX.keys().forEach(key => StorageX.removeItem(key))
 
-HelloStorage.getItem = key => data[key]
-HelloStorage.setItem = (key, value) => { data[key] = value }
-HelloStorage.removeItem = key => { delete data[key] }
-HelloStorage.keys = () => Object.keys(data)
-HelloStorage.key = i => HelloStorage.keys()[i]
-HelloStorage.clear = () => HelloStorage.keys().forEach(key => HelloStorage.removeItem(key))
-
-export default HelloStorage
+export default StorageX
