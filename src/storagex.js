@@ -1,192 +1,239 @@
-import { asyncrun, parsejson } from './utils'
-
 export class StorageX {
   constructor(options) {
-    this.storage = options.storage || StorageX
-    this.namespace = options.namespace || '__STORAGEX__'
-    this.expire = options.expire || 0
+    const { namespace, storage, expire, stringify } = options
+
+    this.storage = storage || makeStorage({})
+    this.expire = expire || 0
     this.async = !!options.async
-    this.stringify = options.stringify === undefined ? true : !!options.stringify
-    this.keys_namespace = this.namespace + '__KEYS__'
+    this.stringify = stringify === undefined ? true : !!stringify
+
+    this.namespace = namespace ? namespace + '.' : ''
+    this.namespace_keys = namespace ? namespace + '.__keys' : ''
   }
   set(key, value, expire) {
-    let id = this.namespace + '.' + key
-    let data = {
+    const name = this.namespace + key
+    const state = {
       time : Date.now(),
       expire: expire || this.expire,
       data : value,
     }
+    const json = this.namespace ? state : value
+    const data = this.stringify ? JSON.stringify(json) : json
 
-    let fn1 = () => this.storage.setItem(id, this.stringify ? JSON.stringify(data) : data)
-    let fn2 = () => this.storage.getItem(this.keys_namespace)
-    let fn3 = (keys) => {
-      keys = parsejson(keys) || []
-      if (keys.indexOf(id) === -1) {
-        keys.push(id)
+    const setData = () => this.storage.setItem(name, data)
+
+    // without namespace, save directly
+    if (!this.namespace) {
+      return setData()
+    }
+
+    const getKeys = () => this.keys()
+    const parseKeys = (keys) => {
+      if (keys.indexOf(key) === -1) {
+        keys.push(key)
       }
-      return this.storage.setItem(this.keys_namespace, JSON.stringify(keys))
+      return this.stringify ? JSON.stringify(keys) : keys
     }
+    const setKeys = (keys) => this.storage.setItem(this.namespace_keys, keys)
 
+    // async store
     if (this.async) {
-      return asyncrun(fn1, fn2, fn3)
+      return Promise.resolve().then(setData).then(getKeys).then(parseKeys).then(setKeys)
     }
-
-    fn1()
-    let keys = fn2()
-    fn3(keys)
+    // sync store
+    else {
+      setData()
+      let keys = getKeys()
+      keys = parseKeys(keys)
+      setKeys(keys)
+      return this
+    }
   }
   get(key) {
-    let id = this.namespace + '.' + key
+    const name = this.namespace + key
 
-    let fn1 = () => this.storage.getItem(id)
-    let fn2 = (data) => {
+    const getData = () => this.storage.getItem(name)
+
+    if (!this.namespace) {
+      return getData()
+    }
+
+    const parseData = (data) => {
       if (!data) {
         return
       }
 
-      let parsed = parsejson(data)
+      const parsed = parseJSON(data)
+
       if (!parsed) {
         return
       }
 
-      let expire = parsed.expire
+      const expire = parsed.expire
+      const origin = parsed.data
+
       if (expire) {
-        let createTime = parsed.time
-        let expireTime = createTime + expire
-        let currentTime = Date.now()
+        const createTime = parsed.time
+        const expireTime = createTime + expire
+        const currentTime = Date.now()
         if (currentTime > expireTime) {
-          return null
+          return { expired: true }
         }
-        return parsed.data
+        return { expired: false, data: origin }
       }
       else {
-        return parsed.data
+        return { expired: false, data: origin }
       }
-    }
-    let fn3 = (value) => {
-      if (value === null) {
-        return this.remove(key)
-      }
-      return value
     }
 
     if (this.async) {
-      return asyncrun(fn1, fn2, fn3)
+      return Promise.resolve().then(getData).then(parseData).then((parsed) => {
+        if (!parsed) {
+          return
+        }
+
+        const { expired, data } = parsed
+
+        if (expired) {
+          return this.remove(name).then(() => undefined)
+        }
+
+        return data
+      })
     }
+    else {
+      const stored = getData()
+      const parsed = parseData(stored)
 
-    let data = fn1()
-    let value = fn2(data)
-    value = fn3(value)
+      if (!parsed) {
+        return
+      }
 
-    return value
+      const { expired, data } = parsed
+
+      if (expired) {
+        this.remove(name)
+        return
+      }
+
+      return data
+    }
   }
   remove(key) {
-    let id = this.namespace + '.' + key
+    const name = this.namespace + key
 
-    let fn1 = () => this.storage.removeItem(id)
-    let fn2 = () => this.storage.getItem(this.keys_namespace)
-    let fn3 = (keys) => {
-      if (keys) {
-        keys = parsejson(keys) || []
-        keys = keys.filter(item => item !== id)
-        return this.storage.setItem(this.keys_namespace, this.stringify ? JSON.stringify(keys) : keys)
-      }
+    const removeData = () => this.storage.removeItem(name)
+
+    // without namespace
+    if (!this.namespace) {
+      return removeData()
     }
 
+    const getKeys = () => this.storage.getItem(this.namespace_keys)
+    const parseKeys = (keys) => {
+      keys = parseJSON(keys) || []
+      keys = keys.filter(item => item !== key)
+      return this.stringify ? JSON.stringify(keys) : keys
+    }
+    const setKeys = (keys) => this.storage.setItem(this.namespace_keys, keys)
+
+    // async store
     if (this.async) {
-      return asyncrun(fn1, fn2, fn3)
+      return Promise.resolve().then(removeData).then(getKeys).then(parseKeys).then(setKeys)
     }
-
-    fn1()
-    let keys = fn2()
-    fn3(keys)
-  }
-  clear() {
-    let fn1 = () => this.storage.getItem(this.keys_namespace)
-    let fn2 = (keys) => {
-      if (keys) {
-        keys = parsejson(keys) || []
-        return keys.map(key => this.storage.removeItem(key))
-      }
-      return []
+    // sync store
+    else {
+      removeData()
+      let keys = getKeys()
+      keys = parseKeys(keys)
+      setKeys(keys)
+      return this
     }
-    let fn3 = () => this.storage.removeItem(this.keys_namespace)
-
-    if (this.async) {
-      return asyncrun(fn1).then((keys) => {
-        let defers = fn2(keys).map(item => asyncrun(() => item))
-        return Promise.all(defers)
-      }).then(fn3)
-    }
-
-    let keys = fn1()
-    fn2(keys)
-    fn3()
-
-    return this
   }
   keys() {
-    let fn1 = () => this.storage.getItem(this.keys_namespace)
-    let fn2 = (keys) => {
-      if (keys) {
-        keys = parsejson(keys) || []
-        keys = keys.map(key => key.replace(this.namespace + '.', ''))
-        return keys
-      }
-      return []
-    }
+    const getKeys = () => this.storage.getItem(this.namespace_keys)
+    const parseKeys = (keys) => parseJSON(keys) || []
 
     if (this.async) {
-      return asyncrun(fn1, fn2)
+      return Promise.resolve().then(getKeys).then(parseKeys)
     }
-
-    let keys = fn1()
-    return fn2(keys)
+    else {
+      const keys = getKeys()
+      return parseKeys(keys)
+    }
   }
   key(i) {
-    let fn1 = () => this.keys()
-    let fn2 = (keys) => keys[i]
+    const getKeys = () => this.keys()
+    const findKey = (keys) => keys[i]
 
     if (this.async) {
-      return asyncrun(fn1, fn2)
+      return Promise.resolve().then(getKeys).then(findKey)
     }
-
-    let keys = fn1()
-    return fn2(keys)
+    else {
+      const keys = getKeys()
+      const key = findKey(keys)
+      return key
+    }
   }
   all() {
-    let build = (keys, results) => {
-      let res = {}
-      results.forEach((value, i) => {
-        let key = keys[i]
-        res[key] = value
-      })
-      return res
-    }
-    let fn1 = () => this.keys()
-    let fn2 = (keys) => {
-      let reuslts = keys.map(key => this.get(key))
-      return build(keys, reuslts)
-    }
-    let fn3 = (keys) => {
-      return Promise.all(keys.map(key => this.get(key))).then(results => build(keys, results))
-    }
+    const getKeys = () => this.keys()
+    const getItems = (keys) => keys.map(key => this.get(key))
 
     if (this.async) {
-      return asyncrun(fn1, fn3)
+      return Promise.resolve().then(getKeys).then((keys) => Promise.all([getItems(keys)]))
     }
+    else {
+      const keys = getKeys()
+      const items = getItems(keys)
+      return items
+    }
+  }
+  clear() {
+    const getKeys = () => this.keys()
+    const removeItems = (keys) => keys.map(key => this.remove(key))
+    const removeKeys = () => this.storage.setItem(this.namespace_keys, [])
 
-    let keys = fn1()
-    return fn2(keys)
+    if (this.async) {
+      return Promise.resolve().then(getKeys).then(removeItems).then(removeKeys)
+    }
+    else {
+      const keys = getKeys()
+      removeItems(keys)
+      removeKeys()
+      return this
+    }
   }
 }
 
-const data = {}
-StorageX.getItem = key => data[key]
-StorageX.setItem = (key, value) => { data[key] = value }
-StorageX.removeItem = key => { delete data[key] }
-StorageX.keys = () => Object.keys(data)
-StorageX.key = i => StorageX.keys()[i]
-StorageX.clear = () => StorageX.keys().forEach(key => StorageX.removeItem(key))
-
 export default StorageX
+
+function makeStorage(obj) {
+  const data = {}
+  obj.getItem = key => data[key]
+  obj.setItem = (key, value) => { data[key] = value }
+  obj.removeItem = key => { delete data[key] }
+  obj.keys = () => Object.keys(data)
+  obj.key = i => obj.keys()[i]
+  obj.clear = () => obj.keys().map(key => StorageX.removeItem(key))
+}
+
+function parseJSON(input) {
+  if (!input) {
+    return
+  }
+
+  if (typeof input === 'object') {
+    return input
+  }
+
+  if (typeof input !== 'string') {
+    return
+  }
+
+  try {
+    return JSON.parse(input)
+  }
+  catch(e) {
+    return
+  }
+}

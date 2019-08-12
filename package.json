@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "js storage scaffold library.",
   "main": "dist/storagex.js",
-  "dependencies": {},
+  "dependencies": {
+    "asw": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.3.0",
